@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { GameMode, UserStats } from '../types';
 import { sound } from '../audio/soundEffects';
 import {
-  BookOpen,
+  GraduationCap,
   Dumbbell,
   Layers,
   Award,
@@ -35,10 +35,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navItems = [
     {
-      id: 'academy' as GameMode,
-      label: 'Academy',
-      icon: BookOpen,
-      desc: 'Step-by-step',
+      id: 'curriculum' as GameMode,
+      label: 'Curriculum',
+      icon: GraduationCap,
+      desc: 'Chapters & Practice',
     },
     {
       id: 'bank1k' as GameMode,
@@ -85,10 +85,10 @@ export const Header: React.FC<HeaderProps> = ({
               <h1 className="text-lg font-black tracking-wider text-stone-100 uppercase">
                 Soroban Zen
               </h1>
-              <span className="text-xs text-orange-400/80 font-mono">日本珠算道場</span>
+              <span className="text-xs text-orange-400/80 font-mono">日本珠算本科</span>
             </div>
             <p className="text-[11px] text-stone-400 tracking-wide">
-              Tactile Japanese Abacus & 1,000 Problem Challenge
+              Official Japanese Abacus Curriculum & Masterclass
             </p>
           </div>
         </div>

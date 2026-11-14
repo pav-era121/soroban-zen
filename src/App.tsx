@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { GameMode, ColorGroupingMode, UserStats, ExamKyuLevel } from './types';
 import { Header } from './components/Header';
-import { AcademyLesson } from './components/AcademyLesson';
+import { SenseiClassroom } from './components/SenseiClassroom';
 import { PracticeGym } from './components/PracticeGym';
 import { ProblemBank1000 } from './components/ProblemBank1000';
 import { ExamDojo } from './components/ExamDojo';
@@ -13,7 +13,7 @@ import {
   BookMarked,
 } from 'lucide-react';
 
-const STORAGE_KEY = 'soroban_zen_stats_v2';
+const STORAGE_KEY = 'soroban_zen_stats_v3';
 
 function calculateRank(xp: number, passedExams: ExamKyuLevel[]): string {
   if (passedExams.includes('dan_master')) return '1st Dan (Master)';
@@ -41,7 +41,7 @@ function calculateRank(xp: number, passedExams: ExamKyuLevel[]): string {
 }
 
 export function App() {
-  const [currentMode, setCurrentMode] = useState<GameMode>('academy');
+  const [currentMode, setCurrentMode] = useState<GameMode>('curriculum');
   const [colorGrouping, setColorGrouping] = useState<ColorGroupingMode>('alternating3');
   const [showFormulaModal, setShowFormulaModal] = useState(false);
 
@@ -86,17 +86,19 @@ export function App() {
     });
   };
 
-  const handleLessonComplete = (lessonId: string) => {
+  const handleChapterMastered = (chapterId: string, points: number) => {
     setStats((prev) => {
-      if (prev.lessonsCompleted.includes(lessonId)) return prev;
-      const updatedLessons = [...prev.lessonsCompleted, lessonId];
-      const newXp = prev.xp + 100;
+      const updatedLessons = prev.lessonsCompleted.includes(chapterId)
+        ? prev.lessonsCompleted
+        : [...prev.lessonsCompleted, chapterId];
+      const newXp = prev.xp + points;
       const newRank = calculateRank(newXp, prev.passedExams);
       return {
         ...prev,
         xp: newXp,
         rank: newRank,
         lessonsCompleted: updatedLessons,
+        problemsSolved: prev.problemsSolved + 3,
       };
     });
   };
@@ -129,11 +131,10 @@ export function App() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-6 sm:py-8 flex flex-col">
-        {currentMode === 'academy' && (
-          <AcademyLesson
+        {currentMode === 'curriculum' && (
+          <SenseiClassroom
             colorGrouping={colorGrouping}
-            onLessonComplete={handleLessonComplete}
-            completedLessons={stats.lessonsCompleted}
+            onChapterMastered={handleChapterMastered}
           />
         )}
 
@@ -297,7 +298,7 @@ export function App() {
           <div className="flex items-center gap-4 text-stone-400">
             <span>Rods: 1:4 Standard (Modern Soroban)</span>
             <span>•</span>
-            <span>Gesture Slide Physics: Active</span>
+            <span>Masterclass Curriculum: Active</span>
           </div>
         </div>
       </footer>
