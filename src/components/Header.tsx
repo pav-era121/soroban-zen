@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Authentic Japanese App Logo & Brand */}
           <div className="flex items-center gap-3">
             <img
-              src="./logo.svg"
+              src="./icon-192.png"
               alt="Soroban Zen Logo"
               className="w-11 h-11 rounded-2xl shadow-lg shadow-orange-950/60 border border-orange-500/30 object-cover transform hover:scale-105 transition-transform"
             />
@@ -204,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* App Icon Preview */}
             <img
-              src="./logo.svg"
+              src="./icon-512.png"
               alt="Soroban Zen Icon"
               className="w-20 h-20 rounded-2xl shadow-2xl shadow-orange-950/80 border-2 border-orange-500/50 object-cover mt-2"
             />
@@ -220,21 +220,28 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Platform Instructions */}
             <div className="w-full space-y-2.5 text-left text-xs mt-1">
-              {/* iPhone / iPad */}
-              <div className="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 flex items-start gap-3">
-                <Share className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-stone-200 block mb-0.5">iPhone & iPad (Safari):</strong>
-                  <span>Tap the <strong>Share</strong> button at the bottom of Safari, scroll down, and tap <strong>"Add to Home Screen"</strong>.</span>
-                </div>
-              </div>
-
               {/* Android */}
               <div className="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 flex items-start gap-3">
                 <Smartphone className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <strong className="text-stone-200 block mb-0.5">Android (Chrome / Samsung):</strong>
-                  <span>Tap the <strong>three dots menu (⋮)</strong> at top right, and tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>.</span>
+                  <span className="text-stone-300 leading-relaxed block">
+                    Tap the <strong>"Install App"</strong> button in the header, or open Chrome's menu (<strong>⋮</strong>) and tap <strong className="text-orange-400">"Install app"</strong>.
+                  </span>
+                  <span className="text-[11px] text-stone-400 block mt-1 italic">
+                    ⚠️ Select <strong>"Install app"</strong> (NOT "Add to Home screen / Add shortcut") so Android generates a true standalone WebAPK with <strong>NO Chrome badge</strong>!
+                  </span>
+                </div>
+              </div>
+
+              {/* iPhone / iPad */}
+              <div className="p-3 bg-stone-950/80 rounded-2xl border border-stone-800 flex items-start gap-3">
+                <Share className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-stone-200 block mb-0.5">iPhone & iPad (Safari):</strong>
+                  <span className="text-stone-300 leading-relaxed block">
+                    Tap the <strong>Share</strong> button (box with upward arrow) at the bottom of Safari, scroll down, and tap <strong>"Add to Home Screen"</strong>.
+                  </span>
                 </div>
               </div>
             </div>

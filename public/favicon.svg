@@ -1,85 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#25211f"/>
-      <stop offset="50%" stopColor="#171413"/>
-      <stop offset="100%" stopColor="#0d0b0a"/>
-    </linearGradient>
-    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#f59e42"/>
-      <stop offset="35%" stopColor="#8a5317"/>
-      <stop offset="70%" stopColor="#e05638"/>
-      <stop offset="100%" stopColor="#4a2610"/>
-    </linearGradient>
-    <linearGradient id="ensoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#e05638"/>
-      <stop offset="40%" stopColor="#f59e42"/>
-      <stop offset="75%" stopColor="#d97736"/>
-      <stop offset="100%" stopColor="#8a2411"/>
-    </linearGradient>
-    <linearGradient id="beadTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#ff8264"/>
-      <stop offset="100%" stopColor="#e05638"/>
-    </linearGradient>
-    <linearGradient id="beadBotGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#c24327"/>
-      <stop offset="100%" stopColor="#872512"/>
-    </linearGradient>
-    <linearGradient id="metalRod" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stopColor="#1a1817"/>
-      <stop offset="50%" stopColor="#665e5b"/>
-      <stop offset="100%" stopColor="#1a1817"/>
-    </linearGradient>
-    <linearGradient id="woodBeam" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#3d3735"/>
-      <stop offset="50%" stopColor="#262221"/>
-      <stop offset="100%" stopColor="#141212"/>
-    </linearGradient>
-  </defs>
-
-  <rect x="16" y="16" width="480" height="480" rx="108" ry="108" fill="url(#bgGrad)" stroke="url(#goldBorder)" stroke-width="5"/>
-  <rect x="28" y="28" width="456" height="456" rx="96" ry="96" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
-
-  <!-- Zen Enso Brush -->
-  <g transform="translate(256, 256)">
-    <path d="M -140,-60 A 165,165 0 1,1 90,145" fill="none" stroke="url(#ensoGrad)" stroke-width="14" stroke-linecap="round" opacity="0.45"/>
-  </g>
-
-  <!-- Soroban Column -->
-  <g transform="translate(196, 76)">
-    <rect x="56" y="20" width="8" height="320" rx="4" fill="url(#metalRod)"/>
-    <rect x="0" y="120" width="120" height="18" rx="3" fill="url(#woodBeam)" stroke="#4a423f" stroke-width="1.5"/>
-    <circle cx="60" cy="129" r="4.5" fill="#ffffff" stroke="#171413" stroke-width="1"/>
-
-    <!-- Upper Bead 5 -->
-    <g transform="translate(60, 94)">
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-    </g>
-
-    <!-- Lower Beads -->
-    <g transform="translate(60, 164)">
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-    </g>
-    <g transform="translate(60, 198)">
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-    </g>
-  </g>
-
-  <!-- Japanese Script -->
-  <text x="256" y="442" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', serif" font-weight="900" font-size="52" fill="#f5eedc" letter-spacing="8">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#161312"/>
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#f59e42" stroke-width="2"/>
+  <!-- Enso Arc -->
+  <path d="M 64,22 A 42,42 0 1,1 28,48" fill="none" stroke="#e05638" stroke-width="6" stroke-linecap="round"/>
+  <!-- Rod -->
+  <rect x="62.5" y="24" width="3" height="80" rx="1.5" fill="#a89c97"/>
+  <!-- Beam -->
+  <rect x="42" y="52" width="44" height="6" rx="1.5" fill="#2c2826" stroke="#574d49" stroke-width="0.8"/>
+  <circle cx="64" cy="55" r="1.5" fill="#ffffff"/>
+  <!-- Upper Bead (5) -->
+  <polygon points="56,44 72,44 79,48 49,48" fill="#f06c4b"/>
+  <polygon points="49,48 79,48 72,52 56,52" fill="#c44527"/>
+  <!-- Lower Bead (1) -->
+  <polygon points="56,58 72,58 79,62 49,62" fill="#f06c4b"/>
+  <polygon points="49,62 79,62 72,66 56,66" fill="#c44527"/>
+  <!-- Lower Bead (1) -->
+  <polygon points="56,68 72,68 79,72 49,72" fill="#f06c4b"/>
+  <polygon points="49,72 79,72 72,76 56,76" fill="#c44527"/>
+  <!-- Text -->
+  <text x="64" y="104" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="16" fill="#fdf8f0">
     そろばん
   </text>
-
-  <!-- Hanko Seal -->
-  <g transform="translate(390, 370) rotate(-4)">
-    <rect x="0" y="0" width="56" height="56" rx="8" fill="#a82113" stroke="#f06c4b" stroke-width="2"/>
-    <text x="28" y="24" text-anchor="middle" font-family="'Hiragino Mincho ProN', serif" font-weight="900" font-size="16" fill="#fdfcf9">珠</text>
-    <text x="28" y="44" text-anchor="middle" font-family="'Hiragino Mincho ProN', serif" font-weight="900" font-size="16" fill="#fdfcf9">算</text>
-  </g>
 </svg>

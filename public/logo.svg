@@ -1,124 +1,114 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Background Lacquer Gradient -->
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#25211f"/>
-      <stop offset="50%" stopColor="#171413"/>
-      <stop offset="100%" stopColor="#0d0b0a"/>
+    <!-- Background Radial Gradient -->
+    <radialGradient id="logoBg" cx="50%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#26201e"/>
+      <stop offset="55%" stop-color="#1a1615"/>
+      <stop offset="100%" stop-color="#0f0d0c"/>
+    </radialGradient>
+
+    <!-- Gold Ring Gradient -->
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e42"/>
+      <stop offset="50%" stop-color="#b87328"/>
+      <stop offset="100%" stop-color="#e05638"/>
     </linearGradient>
 
-    <!-- Outer Gold Bevel Gradient -->
-    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#f59e42"/>
-      <stop offset="35%" stopColor="#8a5317"/>
-      <stop offset="70%" stopColor="#e05638"/>
-      <stop offset="100%" stopColor="#4a2610"/>
+    <!-- Enso Circle Gradient -->
+    <linearGradient id="logoEnso" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e05638"/>
+      <stop offset="40%" stop-color="#f59e42"/>
+      <stop offset="80%" stop-color="#d97736"/>
+      <stop offset="100%" stop-color="#8a2411"/>
     </linearGradient>
 
-    <!-- Zen Enso Brush Circle Gradient -->
-    <linearGradient id="ensoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#e05638"/>
-      <stop offset="40%" stopColor="#f59e42"/>
-      <stop offset="75%" stopColor="#d97736"/>
-      <stop offset="100%" stopColor="#8a2411"/>
+    <!-- Bead Top Slope Gradient -->
+    <linearGradient id="beadTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff8a6a"/>
+      <stop offset="50%" stop-color="#f06c4b"/>
+      <stop offset="100%" stop-color="#e05638"/>
     </linearGradient>
 
-    <!-- Bead Facet Gradients -->
-    <linearGradient id="beadTopGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#ff8264"/>
-      <stop offset="100%" stopColor="#e05638"/>
-    </linearGradient>
-    <linearGradient id="beadBotGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#c24327"/>
-      <stop offset="100%" stopColor="#872512"/>
+    <!-- Bead Bottom Slope Gradient -->
+    <linearGradient id="beadBot" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c44527"/>
+      <stop offset="70%" stop-color="#9e2d14"/>
+      <stop offset="100%" stop-color="#661908"/>
     </linearGradient>
 
-    <!-- Beam & Rod Gradient -->
-    <linearGradient id="metalRod" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stopColor="#1a1817"/>
-      <stop offset="50%" stopColor="#665e5b"/>
-      <stop offset="100%" stopColor="#1a1817"/>
-    </linearGradient>
-    <linearGradient id="woodBeam" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stopColor="#3d3735"/>
-      <stop offset="50%" stopColor="#262221"/>
-      <stop offset="100%" stopColor="#141212"/>
+    <!-- Rod Gradient -->
+    <linearGradient id="rodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1c1918"/>
+      <stop offset="45%" stop-color="#786e6a"/>
+      <stop offset="70%" stop-color="#a89c97"/>
+      <stop offset="100%" stop-color="#221e1d"/>
     </linearGradient>
 
-    <!-- Drop Shadows -->
-    <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
-    </filter>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#f59e42" flood-opacity="0.35"/>
-    </filter>
+    <!-- Beam Gradient -->
+    <linearGradient id="beamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#423b38"/>
+      <stop offset="50%" stop-color="#24201e"/>
+      <stop offset="100%" stop-color="#12100f"/>
+    </linearGradient>
   </defs>
 
-  <!-- 1. SQUIRCLE APP ICON CONTAINER (iOS/Android shape) -->
-  <rect x="16" y="16" width="480" height="480" rx="108" ry="108" fill="url(#bgGrad)" stroke="url(#goldBorder)" stroke-width="5" filter="url(#shadow)"/>
+  <!-- 1. Background -->
+  <rect width="512" height="512" fill="url(#logoBg)"/>
 
-  <!-- Subtle Inner Inset Border -->
-  <rect x="28" y="28" width="456" height="456" rx="96" ry="96" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="2"/>
+  <!-- 2. Outer Gold Ring -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="url(#logoGold)" stroke-width="6"/>
 
-  <!-- 2. ZEN ENSO CIRCLE (円相 - Zen Brush Symbol of Mastery) -->
-  <g transform="translate(256, 256)" filter="url(#glow)">
-    <!-- Dynamic Calligraphic Arc -->
-    <path d="M -140,-60 A 165,165 0 1,1 90,145" fill="none" stroke="url(#ensoGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="800" opacity="0.45"/>
-    <path d="M -150,-40 A 175,175 0 1,1 70,160" fill="none" stroke="url(#ensoGrad)" stroke-width="6" stroke-linecap="round" opacity="0.25"/>
+  <!-- 3. Zen Enso Brush Arc -->
+  <g transform="translate(256, 240) rotate(-14)">
+    <path d="M 0,-150 A 150,150 0 1,1 -140,-50" fill="none" stroke="url(#logoEnso)" stroke-width="18" stroke-linecap="round" opacity="0.95"/>
+    <path d="M 10,-162 A 162,162 0 1,1 -145,-40" fill="none" stroke="rgba(240,108,75,0.35)" stroke-width="4" stroke-linecap="round"/>
   </g>
 
-  <!-- 3. SOROBAN FRAME EMBLEM (Vertical Column) -->
-  <g transform="translate(196, 76)">
-    <!-- Vertical Rod -->
-    <rect x="56" y="20" width="8" height="320" rx="4" fill="url(#metalRod)"/>
+  <!-- 4. Soroban Column Emblem -->
+  <!-- Vertical Rod -->
+  <rect x="251.5" y="95" width="9" height="215" rx="4" fill="url(#rodGrad)"/>
 
-    <!-- Horizontal Reckoning Beam -->
-    <rect x="0" y="120" width="120" height="18" rx="3" fill="url(#woodBeam)" stroke="#4a423f" stroke-width="1.5"/>
-    <line x1="0" y1="122" x2="120" y2="122" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+  <!-- Reckoning Beam -->
+  <rect x="181" y="175" width="150" height="18" rx="3" fill="url(#beamGrad)" stroke="#574d49" stroke-width="1.5"/>
+  <!-- White Unit Dot -->
+  <circle cx="256" cy="184" r="4.5" fill="#ffffff" stroke="#12100f" stroke-width="1"/>
 
-    <!-- White Reckoning Unit Dot (定位点) -->
-    <circle cx="60" cy="129" r="4.5" fill="#ffffff" stroke="#171413" stroke-width="1" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.8))"/>
-
-    <!-- Upper Bead (Heaven 5 - Active, Touching Beam) -->
-    <g transform="translate(60, 94)">
-      <!-- Top slope -->
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <!-- Bottom slope -->
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <!-- Center sharp ridge highlight -->
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-      <circle cx="0" cy="0" r="2.5" fill="#ffffff" opacity="0.8"/>
-    </g>
-
-    <!-- Lower Bead 1 (Earth 1 - Active, Touching Beam from below) -->
-    <g transform="translate(60, 164)">
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-      <circle cx="0" cy="0" r="2.5" fill="#ffffff" opacity="0.8"/>
-    </g>
-
-    <!-- Lower Bead 2 (Earth 1 - Active, Touching Bead 1) -->
-    <g transform="translate(60, 198)">
-      <polygon points="-12,-16 12,-16 48,0 -48,0" fill="url(#beadTopGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <polygon points="-48,0 48,0 12,16 -12,16" fill="url(#beadBotGrad)" stroke="#7e1f0c" stroke-width="1.2"/>
-      <line x1="-46" y1="0" x2="46" y2="0" stroke="rgba(255,255,255,0.5)" stroke-width="1.2"/>
-      <circle cx="0" cy="0" r="2.5" fill="#ffffff" opacity="0.8"/>
-    </g>
+  <!-- Heaven Bead (5 - Touching Beam) -->
+  <g transform="translate(256, 150)">
+    <polygon points="-12,-18 12,-18 50,0 -50,0" fill="url(#beadTop)" stroke="#5a1506" stroke-width="1.8"/>
+    <polygon points="-50,0 50,0 12,18 -12,18" fill="url(#beadBot)" stroke="#5a1506" stroke-width="1.8"/>
+    <line x1="-47" y1="0" x2="47" y2="0" stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    <circle cx="0" cy="-4" r="3.5" fill="#ffffff" opacity="0.8"/>
   </g>
 
-  <!-- 4. CALLIGRAPHIC JAPANESE KANJI: 「算」 (SAN - CALCULATION) -->
-  <text x="256" y="442" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif" font-weight="900" font-size="52" fill="#f5eedc" letter-spacing="8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))">
+  <!-- Earth Bead 1 (1 - Touching Beam) -->
+  <g transform="translate(256, 218)">
+    <polygon points="-12,-18 12,-18 50,0 -50,0" fill="url(#beadTop)" stroke="#5a1506" stroke-width="1.8"/>
+    <polygon points="-50,0 50,0 12,18 -12,18" fill="url(#beadBot)" stroke="#5a1506" stroke-width="1.8"/>
+    <line x1="-47" y1="0" x2="47" y2="0" stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    <circle cx="0" cy="-4" r="3.5" fill="#ffffff" opacity="0.8"/>
+  </g>
+
+  <!-- Earth Bead 2 (1 - Touching Bead 1) -->
+  <g transform="translate(256, 256)">
+    <polygon points="-12,-18 12,-18 50,0 -50,0" fill="url(#beadTop)" stroke="#5a1506" stroke-width="1.8"/>
+    <polygon points="-50,0 50,0 12,18 -12,18" fill="url(#beadBot)" stroke="#5a1506" stroke-width="1.8"/>
+    <line x1="-47" y1="0" x2="47" y2="0" stroke="rgba(255,255,255,0.75)" stroke-width="2.2"/>
+    <circle cx="0" cy="-4" r="3.5" fill="#ffffff" opacity="0.8"/>
+  </g>
+
+  <!-- 5. Japanese Calligraphy 「そろばん」 -->
+  <text x="238" y="358" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif, sans-serif" font-weight="900" font-size="46" fill="#fdf8f0" letter-spacing="4">
     そろばん
   </text>
 
-  <!-- 5. TRADITIONAL RED VERMILION HANKO SEAL (朱印) -->
-  <g transform="translate(390, 370) rotate(-4)">
-    <rect x="0" y="0" width="56" height="56" rx="8" fill="#a82113" stroke="#f06c4b" stroke-width="2" filter="drop-shadow(0 2px 5px rgba(0,0,0,0.5))"/>
-    <text x="28" y="24" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', serif" font-weight="900" font-size="16" fill="#fdfcf9">
+  <!-- 6. Vermilion Hanko Seal 「珠算」 -->
+  <g transform="translate(348, 330) rotate(-4)">
+    <rect x="0" y="0" width="44" height="44" rx="6" fill="#bd2c15" stroke="#f59e42" stroke-width="1.8"/>
+    <text x="22" y="16" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', serif, sans-serif" font-weight="900" font-size="14" fill="#ffffff">
       珠
     </text>
-    <text x="28" y="44" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', serif" font-weight="900" font-size="16" fill="#fdfcf9">
+    <text x="22" y="34" text-anchor="middle" font-family="'Hiragino Mincho ProN', 'Yu Mincho', serif, sans-serif" font-weight="900" font-size="14" fill="#ffffff">
       算
     </text>
   </g>
