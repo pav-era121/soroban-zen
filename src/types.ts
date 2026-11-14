@@ -79,6 +79,18 @@ export interface ExamResult {
   timestamp: string;
 }
 
+export interface KyuExamRecord {
+  bestScorePct: number;
+  lastScorePct: number;
+  correctCount: number;
+  totalCount: number;
+  passed: boolean;
+  attempts: number;
+  lastDate?: string;
+}
+
+export type ExamRecords = Partial<Record<ExamKyuLevel, KyuExamRecord>>;
+
 export interface UserStats {
   rank: string; // "10th Kyu", ... "1st Dan"
   xp: number;
@@ -86,4 +98,5 @@ export interface UserStats {
   streakDays: number;
   lessonsCompleted: string[];
   passedExams: ExamKyuLevel[];
+  examRecords?: ExamRecords;
 }
