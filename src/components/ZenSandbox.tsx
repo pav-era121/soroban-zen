@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ColorGroupingMode, AbacusState } from '../types';
 import { Soroban } from './Soroban';
+import { AnatomyDiagram } from './AnatomyDiagram';
 import {
   createEmptyAbacus,
   abacusToNumber,
@@ -13,6 +14,8 @@ import {
   Sparkles,
   Maximize2,
   Minimize2,
+  X,
+  BookOpen,
 } from 'lucide-react';
 
 interface ZenSandboxProps {
@@ -31,6 +34,8 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
   const [showRodValues, setShowRodValues] = useState(true);
   const [landscapeMode, setLandscapeMode] = useState(false);
   const [showFingerGuide, setShowFingerGuide] = useState(true);
+  const [showAnatomyOverlay, setShowAnatomyOverlay] = useState(false);
+  const [showAnatomyModal, setShowAnatomyModal] = useState(false);
 
   // When rod count changes, resize abacus preserving value if possible
   const handleRodCountChange = (newCount: number) => {
@@ -130,7 +135,27 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
         </div>
 
         {/* Rod Count & Finger Guide */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Anatomy Diagram Quick Triggers */}
+          <button
+            onClick={() => setShowAnatomyOverlay(!showAnatomyOverlay)}
+            className={`px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
+              showAnatomyOverlay
+                ? 'bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-sm'
+                : 'bg-stone-800/60 text-stone-400 border-stone-700/50 hover:text-stone-200'
+            }`}
+          >
+            Anatomy Labels: {showAnatomyOverlay ? 'ON' : 'OFF'}
+          </button>
+
+          <button
+            onClick={() => setShowAnatomyModal(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-stone-700/60 bg-stone-800/70 hover:bg-stone-800 text-stone-300 hover:text-emerald-300 text-xs font-semibold transition-all"
+          >
+            <BookOpen className="w-3 h-3 text-emerald-400" />
+            <span>Anatomy Guide</span>
+          </button>
+
           <button
             onClick={() => setShowFingerGuide(!showFingerGuide)}
             className={`px-2.5 py-1 rounded-lg border text-xs font-semibold ${
@@ -171,6 +196,9 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
           showFingerGuide={showFingerGuide}
           showPlaceLabels={showPlaceLabels}
           showRodValues={showRodValues}
+          showAnatomyOverlay={showAnatomyOverlay}
+          showQuickClearButton={true}
+          onQuickClear={handleClear}
         />
 
         {/* Bottom Actions */}
@@ -218,6 +246,21 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
           <span className="text-orange-400 font-medium">middle or index finger</span> to slide lower earth beads DOWN, and to slide the upper heaven bead (5) up and down.
         </div>
       </div>
+
+      {/* Anatomy Guide Modal */}
+      {showAnatomyModal && (
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+          <div className="relative w-full max-w-4xl my-8">
+            <button
+              onClick={() => setShowAnatomyModal(false)}
+              className="absolute -top-3 -right-3 z-10 w-9 h-9 rounded-full bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-600 flex items-center justify-center shadow-lg transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <AnatomyDiagram />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

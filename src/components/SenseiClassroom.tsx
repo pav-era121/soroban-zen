@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import type { ColorGroupingMode, AbacusState } from '../types';
 import { SENSEI_CURRICULUM } from '../data/curriculum';
 import { Soroban } from './Soroban';
+import { AnatomyDiagram } from './AnatomyDiagram';
 import {
   createEmptyAbacus,
   numberToAbacus,
@@ -353,6 +354,13 @@ export const SenseiClassroom: React.FC<SenseiClassroomProps> = ({
               </div>
             ))}
           </div>
+
+          {/* Interactive Anatomy Diagram (specifically for Chapter 1: Anatomy & Discipline) */}
+          {currentChapter.number === 1 && (
+            <div className="mt-2">
+              <AnatomyDiagram />
+            </div>
+          )}
 
           {/* Next Button */}
           <div className="flex justify-end pt-2">

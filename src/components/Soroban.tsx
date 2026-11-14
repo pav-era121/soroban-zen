@@ -19,6 +19,9 @@ interface SorobanProps {
   highlightRodIndex?: number;
   landscapeMode?: boolean;
   showFingerGuide?: boolean;
+  showAnatomyOverlay?: boolean;
+  showQuickClearButton?: boolean;
+  onQuickClear?: () => void;
 }
 
 interface PointerDragState {
@@ -42,6 +45,9 @@ export const Soroban: React.FC<SorobanProps> = ({
   highlightRodIndex,
   landscapeMode = false,
   showFingerGuide = false,
+  showAnatomyOverlay = false,
+  showQuickClearButton = true,
+  onQuickClear,
 }) => {
   const totalRods = state.length;
   const dragStateRef = useRef<PointerDragState | null>(null);
@@ -208,11 +214,15 @@ export const Soroban: React.FC<SorobanProps> = ({
   const upperDeckHeight = 72;
   const beamHeight = 14;
   const lowerDeckHeight = 164;
-  const totalHeight = 44 + upperDeckHeight + beamHeight + lowerDeckHeight + 36;
 
-  const frameY = 32;
+  const topExtra = showAnatomyOverlay ? 52 : 0;
+  const bottomExtra = showAnatomyOverlay ? 60 : 0;
+  const totalHeight = 44 + upperDeckHeight + beamHeight + lowerDeckHeight + 36 + topExtra + bottomExtra;
+
+  const frameY = 32 + topExtra;
   const frameHeight = upperDeckHeight + beamHeight + lowerDeckHeight;
   const beamY = frameY + upperDeckHeight;
+  const centerX = paddingX + (totalRods * rodWidth) / 2;
 
   const beadW = landscapeMode ? 44 : 38;
   const beadH = 22;
@@ -472,7 +482,259 @@ export const Soroban: React.FC<SorobanProps> = ({
           );
         })}
 
-        {/* 8. FINGER TECHNIQUE VISUAL GUIDES (IF ENABLED) */}
+        {/* 8. ONE-TOUCH QUICK RESET BUTTON (ワンタッチご破算) */}
+        {showQuickClearButton && !readOnly && (
+          <g
+            className="cursor-pointer group"
+            onClick={(e) => {
+              e.stopPropagation();
+              sound.playResetSweep();
+              if (onQuickClear) {
+                onQuickClear();
+              } else {
+                onChange(state.map(() => ({ upper: false, lower: 0 })));
+              }
+            }}
+            style={{ touchAction: 'manipulation' }}
+          >
+            {/* Button Bezel Mount */}
+            <circle
+              cx={centerX}
+              cy={beamY + beamHeight + 16}
+              r={9.5}
+              fill="#221e1d"
+              stroke="#453d39"
+              strokeWidth={1.5}
+              filter="drop-shadow(0 2px 4px rgba(0,0,0,0.6))"
+            />
+            {/* Ivory / White Button Core */}
+            <circle
+              cx={centerX}
+              cy={beamY + beamHeight + 16}
+              r={6}
+              fill="#f5efe6"
+              stroke="#8a7e75"
+              strokeWidth={0.8}
+              className="transition-transform group-hover:scale-110 group-active:scale-90"
+            />
+            <title>ワンタッチご破算 (One-Touch Quick Clear)</title>
+          </g>
+        )}
+
+        {/* 9. ANATOMY OVERLAY (MATCHING TRADITIONAL DIAGRAM) */}
+        {showAnatomyOverlay && (
+          <g className="anatomy-overlay pointer-events-none select-none">
+            {/* Upper Beads Pointer */}
+            {(() => {
+              const uRod = Math.min(totalRods - 1, Math.max(1, Math.floor(totalRods * 0.28)));
+              const uX = paddingX + uRod * rodWidth + rodWidth / 2;
+              const uY = frameY + 22;
+              const labelY = frameY - 24;
+              return (
+                <g>
+                  <text
+                    x={uX}
+                    y={labelY - 14}
+                    textAnchor="middle"
+                    fill="#22c55e"
+                    fontSize={13}
+                    fontWeight="800"
+                    fontFamily="system-ui, sans-serif"
+                  >
+                    Upper Beads
+                  </text>
+                  <text
+                    x={uX}
+                    y={labelY - 1}
+                    textAnchor="middle"
+                    fill="#86efac"
+                    fontSize={9}
+                    fontWeight="600"
+                  >
+                    天珠 (5)
+                  </text>
+                  <line
+                    x1={uX}
+                    y1={labelY + 4}
+                    x2={uX}
+                    y2={uY - 12}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <circle cx={uX} cy={uY} r={4.5} fill="#22c55e" />
+                </g>
+              );
+            })()}
+
+            {/* Rod Pointer */}
+            {(() => {
+              const rRod = Math.min(totalRods - 1, Math.max(1, Math.floor(totalRods * 0.72)));
+              const rX = paddingX + rRod * rodWidth + rodWidth / 2;
+              const rY = frameY + 42;
+              const labelY = frameY - 24;
+              return (
+                <g>
+                  <text
+                    x={rX}
+                    y={labelY - 14}
+                    textAnchor="middle"
+                    fill="#22c55e"
+                    fontSize={13}
+                    fontWeight="800"
+                    fontFamily="system-ui, sans-serif"
+                  >
+                    Rod
+                  </text>
+                  <text
+                    x={rX}
+                    y={labelY - 1}
+                    textAnchor="middle"
+                    fill="#86efac"
+                    fontSize={9}
+                    fontWeight="600"
+                  >
+                    桁 / 軸
+                  </text>
+                  <line
+                    x1={rX}
+                    y1={labelY + 4}
+                    x2={rX}
+                    y2={rY - 6}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <circle cx={rX} cy={rY} r={4.5} fill="#22c55e" />
+                </g>
+              );
+            })()}
+
+            {/* Beam Pointer */}
+            {(() => {
+              const bX = paddingX + 24;
+              const bY = beamY + beamHeight / 2;
+              const labelY = frameY + frameHeight + 38;
+              return (
+                <g>
+                  <line
+                    x1={bX}
+                    y1={labelY - 14}
+                    x2={bX}
+                    y2={bY + 8}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <circle cx={bX} cy={bY} r={4.5} fill="#22c55e" />
+                  <text
+                    x={bX}
+                    y={labelY}
+                    textAnchor="middle"
+                    fill="#22c55e"
+                    fontSize={13}
+                    fontWeight="800"
+                    fontFamily="system-ui, sans-serif"
+                  >
+                    Beam
+                  </text>
+                  <text
+                    x={bX}
+                    y={labelY + 12}
+                    textAnchor="middle"
+                    fill="#86efac"
+                    fontSize={9}
+                    fontWeight="600"
+                  >
+                    梁 (Hari)
+                  </text>
+                </g>
+              );
+            })()}
+
+            {/* Lower Beads Pointer */}
+            {(() => {
+              const lRod = Math.min(totalRods - 1, Math.max(1, Math.floor(totalRods * 0.54)));
+              const lX = paddingX + lRod * rodWidth + rodWidth / 2;
+              const lY = frameY + frameHeight - 38;
+              const labelY = frameY + frameHeight + 38;
+              return (
+                <g>
+                  <line
+                    x1={lX}
+                    y1={labelY - 14}
+                    x2={lX}
+                    y2={lY + 12}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <circle cx={lX} cy={lY} r={4.5} fill="#22c55e" />
+                  <text
+                    x={lX}
+                    y={labelY}
+                    textAnchor="middle"
+                    fill="#22c55e"
+                    fontSize={13}
+                    fontWeight="800"
+                    fontFamily="system-ui, sans-serif"
+                  >
+                    Lower Beads
+                  </text>
+                  <text
+                    x={lX}
+                    y={labelY + 12}
+                    textAnchor="middle"
+                    fill="#86efac"
+                    fontSize={9}
+                    fontWeight="600"
+                  >
+                    地珠 (1 each)
+                  </text>
+                </g>
+              );
+            })()}
+
+            {/* Frame Pointer */}
+            {(() => {
+              const fX = paddingX + totalRods * rodWidth + 4;
+              const fY = frameY + frameHeight - 6;
+              const labelY = frameY + frameHeight + 38;
+              return (
+                <g>
+                  <line
+                    x1={fX}
+                    y1={labelY - 14}
+                    x2={fX}
+                    y2={fY + 6}
+                    stroke="#22c55e"
+                    strokeWidth={2}
+                  />
+                  <circle cx={fX} cy={fY} r={4.5} fill="#22c55e" />
+                  <text
+                    x={fX}
+                    y={labelY}
+                    textAnchor="middle"
+                    fill="#22c55e"
+                    fontSize={13}
+                    fontWeight="800"
+                    fontFamily="system-ui, sans-serif"
+                  >
+                    Frame
+                  </text>
+                  <text
+                    x={fX}
+                    y={labelY + 12}
+                    textAnchor="middle"
+                    fill="#86efac"
+                    fontSize={9}
+                    fontWeight="600"
+                  >
+                    枠 (Waku)
+                  </text>
+                </g>
+              );
+            })()}
+          </g>
+        )}
+
+        {/* 10. FINGER TECHNIQUE VISUAL GUIDES (IF ENABLED) */}
         {showFingerGuide && (
           <g>
             {/* Guide on rightmost rod */}
