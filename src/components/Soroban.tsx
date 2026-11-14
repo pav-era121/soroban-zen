@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import type { AbacusState, ColorGroupingMode } from '../types';
 import { sound } from '../audio/soundEffects';
 import {
@@ -17,6 +17,18 @@ interface SorobanProps {
   showPlaceLabels?: boolean;
   showRodValues?: boolean;
   highlightRodIndex?: number;
+  landscapeMode?: boolean;
+  showFingerGuide?: boolean;
+}
+
+interface PointerDragState {
+  pointerId: number;
+  startX: number;
+  startY: number;
+  rodIndex: number;
+  beadKind: 'upper' | 'lower';
+  beadIndex: number; // 0 for upper; 0-3 for lower
+  hasTriggeredSlide: boolean;
 }
 
 export const Soroban: React.FC<SorobanProps> = ({
@@ -28,14 +40,17 @@ export const Soroban: React.FC<SorobanProps> = ({
   showPlaceLabels = true,
   showRodValues = true,
   highlightRodIndex,
+  landscapeMode = false,
+  showFingerGuide = false,
 }) => {
   const totalRods = state.length;
+  const dragStateRef = useRef<PointerDragState | null>(null);
+  const [activeRodHighlight, setActiveRodHighlight] = useState<number | null>(null);
 
-  // Handle clicking the upper bead (value 5)
-  const handleUpperBeadClick = (rodIndex: number) => {
+  // Toggle or slide upper bead (5)
+  const setUpperBead = (rodIndex: number, newUpper: boolean) => {
     if (readOnly) return;
     const currentState = [...state];
-    const newUpper = !currentState[rodIndex].upper;
     currentState[rodIndex] = {
       ...currentState[rodIndex],
       upper: newUpper,
@@ -44,22 +59,10 @@ export const Soroban: React.FC<SorobanProps> = ({
     onChange(currentState);
   };
 
-  // Handle clicking a lower bead (0-indexed from top near beam: 0 is highest lower bead, 3 is lowest)
-  const handleLowerBeadClick = (rodIndex: number, beadIndex: number) => {
+  // Toggle or slide lower beads (1-4)
+  const setLowerBeads = (rodIndex: number, newLower: number) => {
     if (readOnly) return;
     const currentState = [...state];
-    const currentActiveLower = currentState[rodIndex].lower; // 0 to 4
-    
-    // beadIndex is 0 to 3. If beadIndex < currentActiveLower, that bead is currently active (UP).
-    // Clicking an active bead sets active lower beads to beadIndex (moving this and below down).
-    // Clicking an inactive bead sets active lower beads to beadIndex + 1 (moving this and above up).
-    let newLower = currentActiveLower;
-    if (beadIndex < currentActiveLower) {
-      newLower = beadIndex;
-    } else {
-      newLower = beadIndex + 1;
-    }
-
     currentState[rodIndex] = {
       ...currentState[rodIndex],
       lower: newLower,
@@ -68,10 +71,109 @@ export const Soroban: React.FC<SorobanProps> = ({
     onChange(currentState);
   };
 
-  // Determine bead color palette
+  // POINTER DOWN: Start drag/slide or prepare for tap
+  const handlePointerDown = (
+    e: React.PointerEvent<SVGGElement>,
+    rodIndex: number,
+    beadKind: 'upper' | 'lower',
+    beadIndex: number
+  ) => {
+    if (readOnly) return;
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      (e.currentTarget as Element).setPointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+
+    dragStateRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      rodIndex,
+      beadKind,
+      beadIndex,
+      hasTriggeredSlide: false,
+    };
+    setActiveRodHighlight(rodIndex);
+  };
+
+  // POINTER MOVE: True gesture sliding physics!
+  // Thumb slides lower beads UP; Middle/Index finger slides lower beads DOWN; Upper slides UP & DOWN.
+  const handlePointerMove = (e: React.PointerEvent<SVGGElement>) => {
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== e.pointerId || drag.hasTriggeredSlide) return;
+
+    const deltaY = e.clientY - drag.startY;
+    const threshold = 12; // pixels of movement required to detect intentional slide
+
+    if (drag.beadKind === 'upper') {
+      const isCurrentlyDown = state[drag.rodIndex].upper;
+      // If bead is UP (inactive), sliding DOWN pulls it against the beam
+      if (!isCurrentlyDown && deltaY > threshold) {
+        drag.hasTriggeredSlide = true;
+        setUpperBead(drag.rodIndex, true);
+      }
+      // If bead is DOWN (active), sliding UP pushes it away to the frame
+      else if (isCurrentlyDown && deltaY < -threshold) {
+        drag.hasTriggeredSlide = true;
+        setUpperBead(drag.rodIndex, false);
+      }
+    } else {
+      // Lower beads: beadIndex is 0 to 3 (0 is nearest beam, 3 nearest bottom)
+      const currentActive = state[drag.rodIndex].lower;
+      const isCurrentlyActive = drag.beadIndex < currentActive;
+
+      // Inactive lower bead: sliding UP (thumb motion) raises it and all beads above it to the beam!
+      if (!isCurrentlyActive && deltaY < -threshold) {
+        drag.hasTriggeredSlide = true;
+        setLowerBeads(drag.rodIndex, drag.beadIndex + 1);
+      }
+      // Active lower bead: sliding DOWN (index/middle finger motion) drops it and beads below it away!
+      else if (isCurrentlyActive && deltaY > threshold) {
+        drag.hasTriggeredSlide = true;
+        setLowerBeads(drag.rodIndex, drag.beadIndex);
+      }
+    }
+  };
+
+  // POINTER UP: If movement was less than threshold, treat as a quick tap
+  const handlePointerUp = (e: React.PointerEvent<SVGGElement>) => {
+    const drag = dragStateRef.current;
+    if (!drag || drag.pointerId !== e.pointerId) return;
+
+    if (!drag.hasTriggeredSlide) {
+      // Quick tap fallback
+      if (drag.beadKind === 'upper') {
+        const currentUpper = state[drag.rodIndex].upper;
+        setUpperBead(drag.rodIndex, !currentUpper);
+      } else {
+        const currentLower = state[drag.rodIndex].lower;
+        const newLower = drag.beadIndex < currentLower ? drag.beadIndex : drag.beadIndex + 1;
+        setLowerBeads(drag.rodIndex, newLower);
+      }
+    }
+
+    try {
+      (e.currentTarget as Element).releasePointerCapture(e.pointerId);
+    } catch {
+      // ignore
+    }
+
+    dragStateRef.current = null;
+    setActiveRodHighlight(null);
+  };
+
+  const handlePointerCancel = () => {
+    dragStateRef.current = null;
+    setActiveRodHighlight(null);
+  };
+
+  // Determine bead colors
   const getBeadColors = (rodIndex: number) => {
     if (colorGrouping === 'uniform' || ghostMode) {
-      // Classic Terracotta (matches uploaded image)
       return {
         top: '#f06c4b',
         mid: '#e05638',
@@ -80,10 +182,9 @@ export const Soroban: React.FC<SorobanProps> = ({
       };
     }
 
-    // 3-Column Alternating Grouping
+    // 3-Column Alternating Grouping (Thousands & Millions aid)
     const group = getRodGroup3Index(rodIndex, totalRods);
     if (group % 2 === 0) {
-      // Group A (Ones, Tens, Hundreds & Millions...): Warm Terracotta / Cinnabar
       return {
         top: '#f06c4b',
         mid: '#e05638',
@@ -91,7 +192,6 @@ export const Soroban: React.FC<SorobanProps> = ({
         stroke: '#8a2411',
       };
     } else {
-      // Group B (Thousands, Ten-Thousands, 100K...): Warm Golden Bamboo / Amber Ochre
       return {
         top: '#f59e42',
         mid: '#e08328',
@@ -101,9 +201,9 @@ export const Soroban: React.FC<SorobanProps> = ({
     }
   };
 
-  // Dimensions for responsive SVG layout
-  const rodWidth = 44;
-  const paddingX = 24;
+  // Dimensions
+  const rodWidth = landscapeMode ? 52 : 44;
+  const paddingX = landscapeMode ? 28 : 24;
   const totalWidth = paddingX * 2 + totalRods * rodWidth;
   const upperDeckHeight = 72;
   const beamHeight = 14;
@@ -114,29 +214,35 @@ export const Soroban: React.FC<SorobanProps> = ({
   const frameHeight = upperDeckHeight + beamHeight + lowerDeckHeight;
   const beamY = frameY + upperDeckHeight;
 
-  // Bead dimensions (Bi-conical diamond profile)
-  const beadW = 38;
+  const beadW = landscapeMode ? 44 : 38;
   const beadH = 22;
 
   return (
-    <div className="soroban-container select-none w-full flex flex-col items-center">
+    <div
+      className={`soroban-container select-none w-full flex flex-col items-center ${
+        landscapeMode ? 'max-w-6xl' : 'max-w-4xl'
+      }`}
+      style={{
+        touchAction: 'none', // PREVENTS MOBILE PAGE SCROLLING WHEN SLIDING BEADS!
+      }}
+    >
       <svg
         viewBox={`0 0 ${totalWidth} ${totalHeight}`}
-        className="soroban-svg w-full max-w-4xl drop-shadow-2xl"
+        className="soroban-svg w-full drop-shadow-2xl"
         style={{
-          filter: 'drop-shadow(0 15px 30px rgba(0,0,0,0.35))',
-          touchAction: 'manipulation',
+          touchAction: 'none', // PREVENT DRAG-TO-SCROLL ON ALL BROWSERS
+          filter: 'drop-shadow(0 15px 35px rgba(0,0,0,0.45))',
         }}
       >
         <defs>
-          {/* Outer Frame Gradient - Sleek Ebony / Dark Rosewood */}
+          {/* Outer Frame Gradient - Authentic Sleek Ebony / Dark Rosewood */}
           <linearGradient id="frameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#2b2625" />
             <stop offset="50%" stopColor="#1e1b1a" />
             <stop offset="100%" stopColor="#141212" />
           </linearGradient>
 
-          {/* Inner Cavity Shadow */}
+          {/* Inner Cavity Recess Shadow */}
           <linearGradient id="cavityGradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#121010" />
             <stop offset="100%" stopColor="#1d1918" />
@@ -149,7 +255,7 @@ export const Soroban: React.FC<SorobanProps> = ({
             <stop offset="100%" stopColor="#171413" />
           </linearGradient>
 
-          {/* Metal Rod Gradient */}
+          {/* Metal/Bamboo Rod Gradient */}
           <linearGradient id="rodGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#1a1817" />
             <stop offset="45%" stopColor="#4a4442" />
@@ -171,7 +277,7 @@ export const Soroban: React.FC<SorobanProps> = ({
           strokeWidth={3}
         />
 
-        {/* 2. INNER CAVITY (Dark recess where beads slide) */}
+        {/* 2. INNER CAVITY */}
         <rect
           x={paddingX - 4}
           y={frameY - 2}
@@ -187,22 +293,23 @@ export const Soroban: React.FC<SorobanProps> = ({
         {/* 3. VERTICAL RODS */}
         {state.map((_, i) => {
           const rodX = paddingX + i * rodWidth + rodWidth / 2;
-          const isHighlighted = highlightRodIndex === i;
+          const isHighlighted = highlightRodIndex === i || activeRodHighlight === i;
+
           return (
             <g key={`rod-${i}`}>
-              {/* Highlight halo if this rod is targeted in a lesson */}
+              {/* Highlight halo if this rod is targeted */}
               {isHighlighted && (
                 <rect
                   x={rodX - rodWidth / 2 + 2}
                   y={frameY}
                   width={rodWidth - 4}
                   height={frameHeight}
-                  fill="rgba(240, 108, 75, 0.15)"
+                  fill="rgba(240, 108, 75, 0.16)"
                   rx={4}
                   className="animate-pulse"
                 />
               )}
-              {/* Metal/Bamboo rod */}
+              {/* Metal/Bamboo Rod */}
               <rect
                 x={rodX - 2.5}
                 y={frameY}
@@ -215,26 +322,28 @@ export const Soroban: React.FC<SorobanProps> = ({
           );
         })}
 
-        {/* 4. BEADS (UPPER & LOWER) */}
+        {/* 4. BEADS (UPPER & LOWER) WITH TRUE SLIDE / FLICK GESTURES */}
         {state.map((rod, i) => {
           const rodX = paddingX + i * rodWidth + rodWidth / 2;
           const colors = getBeadColors(i);
           const activeLowerCount = rod.lower;
 
           // Upper bead position
-          // If NOT active (upper === false): pushed UP against top frame (y = frameY + 3)
-          // If ACTIVE (upper === true): pushed DOWN against beam (y = beamY - beadH - 2)
           const upperY = rod.upper ? beamY - beadH - 2 : frameY + 4;
 
           return (
             <g key={`rod-beads-${i}`}>
-              {/* UPPER BEAD (Value 5) */}
+              {/* UPPER BEAD (Value 5) - Slide UP/DOWN with index or middle finger */}
               <g
-                className="bead-group cursor-pointer transition-all duration-150 ease-out"
-                onClick={() => handleUpperBeadClick(i)}
+                className="bead-group cursor-grab active:cursor-grabbing transition-transform duration-150 ease-out"
+                onPointerDown={(e) => handlePointerDown(e, i, 'upper', 0)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
                 style={{
                   transform: `translate(${rodX}px, ${upperY}px)`,
                   opacity: ghostMode ? (rod.upper ? 0.8 : 0.2) : 1,
+                  touchAction: 'none',
                 }}
               >
                 <BiConicalBead
@@ -248,18 +357,10 @@ export const Soroban: React.FC<SorobanProps> = ({
               {/* LOWER BEADS (Value 1 each, 4 beads total: index 0 to 3) */}
               {[0, 1, 2, 3].map((beadIdx) => {
                 const isActive = beadIdx < activeLowerCount;
-                // If ACTIVE (pushed UP against beam):
-                // beadIdx 0 touches beam: beamY + beamHeight + 2
-                // beadIdx 1 touches bead 0: beamY + beamHeight + 2 + beadH
-                // ...
-                // If INACTIVE (pushed DOWN against bottom frame):
-                // beadIdx 3 sits at bottom: (frameY + frameHeight) - beadH - 4
-                // beadIdx 2 sits above 3: (frameY + frameHeight) - beadH * 2 - 4
                 let beadY: number;
                 if (isActive) {
                   beadY = beamY + beamHeight + 2 + beadIdx * (beadH + 1);
                 } else {
-                  // Inactive bead offset from bottom
                   const inactiveOffset = 3 - beadIdx;
                   beadY = frameY + frameHeight - beadH - 4 - inactiveOffset * (beadH + 1);
                 }
@@ -267,11 +368,15 @@ export const Soroban: React.FC<SorobanProps> = ({
                 return (
                   <g
                     key={`lower-${i}-${beadIdx}`}
-                    className="bead-group cursor-pointer transition-all duration-150 ease-out"
-                    onClick={() => handleLowerBeadClick(i, beadIdx)}
+                    className="bead-group cursor-grab active:cursor-grabbing transition-transform duration-150 ease-out"
+                    onPointerDown={(e) => handlePointerDown(e, i, 'lower', beadIdx)}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerCancel}
                     style={{
                       transform: `translate(${rodX}px, ${beadY}px)`,
                       opacity: ghostMode ? (isActive ? 0.8 : 0.2) : 1,
+                      touchAction: 'none',
                     }}
                   >
                     <BiConicalBead
@@ -287,7 +392,7 @@ export const Soroban: React.FC<SorobanProps> = ({
           );
         })}
 
-        {/* 5. HORIZONTAL RECKONING BEAM (BEAM BAR) */}
+        {/* 5. HORIZONTAL RECKONING BEAM */}
         <rect
           x={paddingX - 10}
           y={beamY}
@@ -298,13 +403,12 @@ export const Soroban: React.FC<SorobanProps> = ({
           stroke="#47403d"
           strokeWidth={1}
         />
-        {/* Subtle highlight line on top edge of beam */}
         <line
           x1={paddingX - 10}
           y1={beamY + 1}
           x2={paddingX - 10 + totalRods * rodWidth + 20}
           y2={beamY + 1}
-          stroke="rgba(255,255,255,0.18)"
+          stroke="rgba(255,255,255,0.22)"
           strokeWidth={1}
         />
 
@@ -328,7 +432,7 @@ export const Soroban: React.FC<SorobanProps> = ({
           );
         })}
 
-        {/* 7. PLACE VALUE LABELS & DIGIT READOUT (ABOVE & BELOW) */}
+        {/* 7. PLACE VALUE LABELS & DIGIT READOUT */}
         {state.map((rod, i) => {
           const rodX = paddingX + i * rodWidth + rodWidth / 2;
           const digit = getRodDigit(rod);
@@ -337,14 +441,13 @@ export const Soroban: React.FC<SorobanProps> = ({
 
           return (
             <g key={`labels-${i}`}>
-              {/* Place Value Header (Top: 1, 10, 100, 1K...) */}
               {showPlaceLabels && (
                 <text
                   x={rodX}
                   y={frameY - 18}
                   textAnchor="middle"
                   fill={isHighlighted ? '#e05638' : '#8c827d'}
-                  fontSize={11}
+                  fontSize={landscapeMode ? 12 : 11}
                   fontWeight={isHighlighted ? '700' : '500'}
                   fontFamily="system-ui, -apple-system, sans-serif"
                 >
@@ -352,14 +455,13 @@ export const Soroban: React.FC<SorobanProps> = ({
                 </text>
               )}
 
-              {/* Single Rod Digit Value Readout (Bottom: 0 to 9) */}
               {showRodValues && !ghostMode && (
                 <text
                   x={rodX}
                   y={frameY + frameHeight + 24}
                   textAnchor="middle"
                   fill={digit > 0 ? '#f06c4b' : '#6b6360'}
-                  fontSize={15}
+                  fontSize={landscapeMode ? 16 : 15}
                   fontWeight={digit > 0 ? '700' : '500'}
                   fontFamily="'SF Pro Display', system-ui, sans-serif"
                 >
@@ -369,12 +471,37 @@ export const Soroban: React.FC<SorobanProps> = ({
             </g>
           );
         })}
+
+        {/* 8. FINGER TECHNIQUE VISUAL GUIDES (IF ENABLED) */}
+        {showFingerGuide && (
+          <g>
+            {/* Guide on rightmost rod */}
+            <text
+              x={paddingX + (totalRods - 1) * rodWidth + rodWidth / 2 + 22}
+              y={frameY + 28}
+              fill="#d97736"
+              fontSize={10}
+              fontWeight="bold"
+            >
+              👆 Middle/Index: 5 UP & DOWN
+            </text>
+            <text
+              x={paddingX + (totalRods - 1) * rodWidth + rodWidth / 2 + 22}
+              y={frameY + frameHeight - 35}
+              fill="#e05638"
+              fontSize={10}
+              fontWeight="bold"
+            >
+              👍 Thumb: Earth UP / 👆 Down
+            </text>
+          </g>
+        )}
       </svg>
     </div>
   );
 };
 
-// True Japanese Soroban Bi-Conical (Diamond) Bead Component
+// Bi-conical diamond bead component
 const BiConicalBead: React.FC<{
   w: number;
   h: number;
@@ -383,19 +510,13 @@ const BiConicalBead: React.FC<{
 }> = ({ w, h, colors, isActive }) => {
   const halfW = w / 2;
   const halfH = h / 2;
-  const ridgeY = 0; // middle sharp ridge
-
-  // Diamond / Bi-conical polygon vertices centered at (0,0)
-  // Top point (flat small rim): (-6, -halfH) to (6, -halfH)
-  // Rightmost sharp ridge: (halfW, ridgeY)
-  // Bottom point (flat small rim): (6, halfH) to (-6, halfH)
-  // Leftmost sharp ridge: (-halfW, ridgeY)
+  const ridgeY = 0;
   const topRimW = 7;
   const botRimW = 7;
 
   return (
     <g>
-      {/* Upper Slope Facet (Reflects light) */}
+      {/* Upper Slope Facet */}
       <polygon
         points={`
           -${topRimW},-${halfH} 
@@ -408,7 +529,7 @@ const BiConicalBead: React.FC<{
         strokeWidth={0.7}
       />
 
-      {/* Lower Slope Facet (In shadow) */}
+      {/* Lower Slope Facet */}
       <polygon
         points={`
           -${halfW},${ridgeY} 
@@ -437,7 +558,7 @@ const BiConicalBead: React.FC<{
           cx={0}
           cy={0}
           r={2}
-          fill="rgba(255,255,255,0.6)"
+          fill="rgba(255,255,255,0.7)"
         />
       )}
     </g>

@@ -3,6 +3,7 @@ import type { GameMode, ColorGroupingMode, UserStats, ExamKyuLevel } from './typ
 import { Header } from './components/Header';
 import { AcademyLesson } from './components/AcademyLesson';
 import { PracticeGym } from './components/PracticeGym';
+import { ProblemBank1000 } from './components/ProblemBank1000';
 import { ExamDojo } from './components/ExamDojo';
 import { FlashAnzan } from './components/FlashAnzan';
 import { ZenSandbox } from './components/ZenSandbox';
@@ -14,7 +15,6 @@ import {
 
 const STORAGE_KEY = 'soroban_zen_stats_v2';
 
-// Calculate Kyu/Dan ranking based on total XP and passed exams
 function calculateRank(xp: number, passedExams: ExamKyuLevel[]): string {
   if (passedExams.includes('dan_master')) return '1st Dan (Master)';
   if (passedExams.includes('1st_kyu')) return '1st Kyu';
@@ -27,7 +27,6 @@ function calculateRank(xp: number, passedExams: ExamKyuLevel[]): string {
   if (passedExams.includes('8th_kyu')) return '8th Kyu';
   if (passedExams.includes('9th_kyu')) return '9th Kyu';
 
-  // Fallback to XP calculation if no exams passed yet
   if (xp >= 1500) return '1st Dan (Master)';
   if (xp >= 1000) return '1st Kyu';
   if (xp >= 750) return '2nd Kyu';
@@ -135,6 +134,13 @@ export function App() {
             colorGrouping={colorGrouping}
             onLessonComplete={handleLessonComplete}
             completedLessons={stats.lessonsCompleted}
+          />
+        )}
+
+        {currentMode === 'bank1k' && (
+          <ProblemBank1000
+            colorGrouping={colorGrouping}
+            onProblemSolved={addXp}
           />
         )}
 
@@ -291,7 +297,7 @@ export function App() {
           <div className="flex items-center gap-4 text-stone-400">
             <span>Rods: 1:4 Standard (Modern Soroban)</span>
             <span>•</span>
-            <span>3-Rod Place Value Coloring: Active</span>
+            <span>Gesture Slide Physics: Active</span>
           </div>
         </div>
       </footer>

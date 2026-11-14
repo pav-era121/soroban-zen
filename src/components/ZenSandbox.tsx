@@ -11,6 +11,8 @@ import { sound } from '../audio/soundEffects';
 import {
   RotateCcw,
   Sparkles,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 
 interface ZenSandboxProps {
@@ -22,11 +24,13 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
   colorGrouping,
   setColorGrouping,
 }) => {
-  const [rodCount, setRodCount] = useState<number>(9);
-  const [abacusState, setAbacusState] = useState<AbacusState>(() => createEmptyAbacus(9));
+  const [rodCount, setRodCount] = useState<number>(13);
+  const [abacusState, setAbacusState] = useState<AbacusState>(() => createEmptyAbacus(13));
   const [customInput, setCustomInput] = useState('');
   const [showPlaceLabels, setShowPlaceLabels] = useState(true);
   const [showRodValues, setShowRodValues] = useState(true);
+  const [landscapeMode, setLandscapeMode] = useState(false);
+  const [showFingerGuide, setShowFingerGuide] = useState(true);
 
   // When rod count changes, resize abacus preserving value if possible
   const handleRodCountChange = (newCount: number) => {
@@ -51,7 +55,7 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
   const totalValue = abacusToNumber(abacusState);
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
+    <div className={`w-full mx-auto flex flex-col gap-6 ${landscapeMode ? 'max-w-6xl' : 'max-w-4xl'}`}>
       {/* Top Value Display & Controls */}
       <div className="bg-stone-900/90 border border-stone-800 p-5 rounded-3xl flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div>
@@ -63,30 +67,44 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
           </div>
         </div>
 
-        {/* Set to number quick input */}
-        <div className="flex items-center gap-2">
-          <input
-            type="number"
-            value={customInput}
-            onChange={(e) => setCustomInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleSetCustomNumber();
-            }}
-            placeholder="Type any number..."
-            className="w-36 sm:w-44 bg-stone-950 border border-stone-700/80 rounded-xl px-3 py-2 text-xs font-mono text-stone-200 outline-none focus:border-orange-500"
-          />
+        {/* Set to number quick input & Landscape toggle */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSetCustomNumber();
+              }}
+              placeholder="Type any number..."
+              className="w-36 sm:w-44 bg-stone-950 border border-stone-700/80 rounded-xl px-3 py-2 text-xs font-mono text-stone-200 outline-none focus:border-orange-500"
+            />
+            <button
+              onClick={handleSetCustomNumber}
+              className="px-3 py-2 text-xs font-semibold rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 transition-colors"
+            >
+              Set Beads
+            </button>
+          </div>
+
           <button
-            onClick={handleSetCustomNumber}
-            className="px-3 py-2 text-xs font-semibold rounded-xl bg-stone-800 hover:bg-stone-700 text-stone-200 transition-colors"
+            onClick={() => setLandscapeMode(!landscapeMode)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
+              landscapeMode
+                ? 'bg-orange-600 text-white border-orange-500'
+                : 'bg-stone-800 text-stone-300 border-stone-700 hover:text-white'
+            }`}
           >
-            Set Beads
+            {landscapeMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <span>{landscapeMode ? 'Standard' : 'Landscape Desk View'}</span>
           </button>
         </div>
       </div>
 
       {/* Visual Options Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-2 text-xs">
-        {/* Color Grouping Switcher (addresses user's specific request!) */}
+        {/* Color Grouping Switcher */}
         <div className="flex items-center gap-2">
           <span className="text-stone-400 font-semibold uppercase tracking-wider">Bead Colors:</span>
           <button
@@ -97,7 +115,7 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
                 : 'bg-stone-800/60 text-stone-400 border-stone-700/50 hover:text-stone-200'
             }`}
           >
-            3-Column Groups (Thousands / Millions Aid)
+            3-Column Groups
           </button>
           <button
             onClick={() => setColorGrouping('uniform')}
@@ -107,26 +125,39 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
                 : 'bg-stone-800/60 text-stone-400 border-stone-700/50 hover:text-stone-200'
             }`}
           >
-            Classic Uniform Terracotta (Anzan Pure)
+            Uniform (Anzan Pure)
           </button>
         </div>
 
-        {/* Rod Count Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-stone-400 font-semibold uppercase tracking-wider">Rods:</span>
-          {[7, 9, 13].map((cnt) => (
-            <button
-              key={cnt}
-              onClick={() => handleRodCountChange(cnt)}
-              className={`px-2.5 py-1 rounded-lg border text-xs font-semibold ${
-                rodCount === cnt
-                  ? 'bg-orange-600 text-white border-orange-500'
-                  : 'bg-stone-800/60 text-stone-400 border-stone-700/50 hover:bg-stone-800'
-              }`}
-            >
-              {cnt}
-            </button>
-          ))}
+        {/* Rod Count & Finger Guide */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowFingerGuide(!showFingerGuide)}
+            className={`px-2.5 py-1 rounded-lg border text-xs font-semibold ${
+              showFingerGuide
+                ? 'bg-amber-950/60 border-amber-600/50 text-amber-300'
+                : 'bg-stone-800/60 text-stone-400 border-stone-700/50'
+            }`}
+          >
+            Finger Guide: {showFingerGuide ? 'ON' : 'OFF'}
+          </button>
+
+          <div className="flex items-center gap-1.5">
+            <span className="text-stone-400 font-semibold uppercase tracking-wider">Rods:</span>
+            {[7, 9, 13, 17].map((cnt) => (
+              <button
+                key={cnt}
+                onClick={() => handleRodCountChange(cnt)}
+                className={`px-2.5 py-1 rounded-lg border text-xs font-semibold ${
+                  rodCount === cnt
+                    ? 'bg-orange-600 text-white border-orange-500'
+                    : 'bg-stone-800/60 text-stone-400 border-stone-700/50 hover:bg-stone-800'
+                }`}
+              >
+                {cnt}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -136,6 +167,8 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
           state={abacusState}
           onChange={setAbacusState}
           colorGrouping={colorGrouping}
+          landscapeMode={landscapeMode}
+          showFingerGuide={showFingerGuide}
           showPlaceLabels={showPlaceLabels}
           showRodValues={showRodValues}
         />
@@ -175,13 +208,14 @@ export const ZenSandbox: React.FC<ZenSandboxProps> = ({
         </div>
       </div>
 
-      {/* Zen Tips */}
+      {/* Zen Finger Technique Tips */}
       <div className="bg-stone-950/60 border border-stone-800/60 rounded-2xl p-4 text-xs text-stone-400 flex items-start gap-3">
         <Sparkles className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
         <div className="leading-relaxed">
-          <strong className="text-stone-200 font-semibold">Traditional Soroban Finger Rules:</strong> Use your{' '}
-          <span className="text-orange-400 font-medium">thumb</span> to push lower earth beads UP towards the beam. Use your{' '}
-          <span className="text-orange-400 font-medium">index finger</span> to pull lower earth beads DOWN, and to move the upper heaven bead (5) in both directions.
+          <strong className="text-stone-200 font-semibold">Slide / Flick Gesture Support:</strong> You can now{' '}
+          <span className="text-orange-400 font-medium">slide fingers directly on the beads</span>! Use your{' '}
+          <span className="text-orange-400 font-medium">thumb</span> to slide lower earth beads UP towards the beam. Use your{' '}
+          <span className="text-orange-400 font-medium">middle or index finger</span> to slide lower earth beads DOWN, and to slide the upper heaven bead (5) up and down.
         </div>
       </div>
     </div>

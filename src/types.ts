@@ -7,7 +7,7 @@ export type AbacusState = RodValue[];
 
 export type ColorGroupingMode = 'alternating3' | 'uniform' | 'highlightActive';
 
-export type GameMode = 'academy' | 'practice' | 'exam' | 'anzan' | 'sandbox';
+export type GameMode = 'academy' | 'practice' | 'bank1k' | 'exam' | 'anzan' | 'sandbox';
 
 export type LessonCategory = 
   | 'basics'

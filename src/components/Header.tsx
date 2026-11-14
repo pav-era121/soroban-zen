@@ -4,6 +4,7 @@ import { sound } from '../audio/soundEffects';
 import {
   BookOpen,
   Dumbbell,
+  Layers,
   Award,
   Zap,
   Compass,
@@ -37,7 +38,13 @@ export const Header: React.FC<HeaderProps> = ({
       id: 'academy' as GameMode,
       label: 'Academy',
       icon: BookOpen,
-      desc: 'Lessons & Wari-zan',
+      desc: 'Step-by-step',
+    },
+    {
+      id: 'bank1k' as GameMode,
+      label: '1K Bank',
+      icon: Layers,
+      desc: '1,000 Questions',
     },
     {
       id: 'practice' as GameMode,
@@ -81,7 +88,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-xs text-orange-400/80 font-mono">日本珠算道場</span>
             </div>
             <p className="text-[11px] text-stone-400 tracking-wide">
-              Official Japanese Abacus & Anzan Certification
+              Tactile Japanese Abacus & 1,000 Problem Challenge
             </p>
           </div>
         </div>
