@@ -76,9 +76,9 @@ export const Header: React.FC<HeaderProps> = ({
     },
     {
       id: 'bank1k' as GameMode,
-      label: '1K Bank',
+      label: '1,000+ Bank',
       icon: Layers,
-      desc: '1,000 Questions',
+      desc: '1,000 + 鬼神 Devil Level',
     },
     {
       id: 'practice' as GameMode,

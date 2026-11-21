@@ -1,6 +1,6 @@
 export interface BankQuestion {
-  id: number; // 1 to 1000
-  stage: number; // 1 to 7
+  id: number; // 1 to 1100+
+  stage: number; // 1 to 8
   stageName: string;
   stageJapanese: string;
   category: 'mitorizan' | 'kakezan' | 'warizan';
@@ -12,6 +12,30 @@ export interface BankQuestion {
   expectedResult: number;
   hint: string;
 }
+
+export const TOTAL_CORE_QUESTIONS = 1000;
+export const TOTAL_KISHIN_QUESTIONS = 100;
+export const MAX_QUESTION_ID = 1100;
+
+export interface StageInfo {
+  id: number;
+  name: string;
+  japanese: string;
+  range: [number, number];
+  description: string;
+  isKishin?: boolean;
+}
+
+export const STAGES_INFO: StageInfo[] = [
+  { id: 1, name: 'Stage 1: Direct Moves', japanese: '第1部: 見取算の基本 (直接加減算)', range: [1, 150], description: 'Direct moves without borrows or carries.' },
+  { id: 2, name: 'Stage 2: Friends of 5', japanese: '第2部: 五の補数加減算', range: [151, 300], description: 'Using the Heaven 5 bead (+/- 1, 2, 3, 4).' },
+  { id: 3, name: 'Stage 3: Friends of 10', japanese: '第3部: 十の補数 (繰り上がり・繰り下がり)', range: [301, 450], description: 'Carrying and borrowing across the tens rod.' },
+  { id: 4, name: 'Stage 4: Mixed Combinations', japanese: '第4部: 破五加減算 (混合公式の極意)', range: [451, 600], description: 'Complex carries and borrows involving both 5 and 10.' },
+  { id: 5, name: 'Stage 5: Multiplication', japanese: '第5部: 乗算特訓 (掛け算)', range: [601, 750], description: 'Progressive Kake-zan: 2-digit to 3-digit multiplication.' },
+  { id: 6, name: 'Stage 6: Division', japanese: '第6部: 除算特訓 (割り算)', range: [751, 900], description: 'Progressive Wari-zan: 3-digit and 4-digit division.' },
+  { id: 7, name: 'Stage 7: Grandmaster Marathon', japanese: '第7部: 名人総合特訓 (最難関)', range: [901, 1000], description: 'Championship multi-digit marathons.' },
+  { id: 8, name: 'Stage 8: 鬼神 Kishin (Devil Level)', japanese: '第8部: 鬼神の試練 (最凶・究極領域)', range: [1001, 1100], description: 'Extreme Demonic God Level: Multi-million 8-row columns, 4x4 digit multiplication, and 8-digit division.', isKishin: true },
+];
 
 // Pseudo-random deterministic generator using linear congruential generator (LCG)
 // Ensures question #X is always identical across every device and reload!
@@ -72,10 +96,12 @@ export function generateQuestionById(id: number): BankQuestion {
       { n1: 3, n2: 4, text: '3 + 4', res: 7, h: '+4 = +5 - 1' },
     ];
     const pick = pairs[id % pairs.length];
-    const extra = Math.floor(rng() * 15) * 10;
+    const extra = Math.floor(rng() * 18) * 10;
     const finalN1 = pick.n1 + extra;
     const finalRes = pick.res + extra;
-    const finalProblem = `${finalN1} ${pick.n2 > 0 ? `+ ${pick.n2}` : `- ${Math.abs(pick.n2)}`}`;
+    const op: '+' | '-' = pick.n2 > 0 ? '+' : '-';
+    const absN2 = Math.abs(pick.n2);
+    const finalProblem = `${finalN1} ${op} ${absN2}`;
 
     return {
       id,
@@ -83,6 +109,10 @@ export function generateQuestionById(id: number): BankQuestion {
       stageName: 'Friends of 5 Mastery (五の補数特訓)',
       stageJapanese: '第2部: 五の補数加減算',
       category: 'mitorizan',
+      num1: finalN1,
+      operation: op,
+      num2: absN2,
+      numbers: [finalN1, pick.n2],
       problemText: finalProblem,
       expectedResult: finalRes,
       hint: pick.h,
@@ -104,10 +134,12 @@ export function generateQuestionById(id: number): BankQuestion {
       { n1: 16, n2: -9, text: '16 - 9', res: 7, h: '-9 = -10 + 1' },
     ];
     const pick = pairs[id % pairs.length];
-    const tens = Math.floor(rng() * 20) * 10;
+    const tens = Math.floor(rng() * 25) * 10;
     const finalN1 = pick.n1 + tens;
     const finalRes = pick.res + tens;
-    const finalProblem = `${finalN1} ${pick.n2 > 0 ? `+ ${pick.n2}` : `- ${Math.abs(pick.n2)}`}`;
+    const op: '+' | '-' = pick.n2 > 0 ? '+' : '-';
+    const absN2 = Math.abs(pick.n2);
+    const finalProblem = `${finalN1} ${op} ${absN2}`;
 
     return {
       id,
@@ -115,6 +147,10 @@ export function generateQuestionById(id: number): BankQuestion {
       stageName: 'Friends of 10 Carries & Borrows (十の補数)',
       stageJapanese: '第3部: 十の補数 (繰り上がり・繰り下がり)',
       category: 'mitorizan',
+      num1: finalN1,
+      operation: op,
+      num2: absN2,
+      numbers: [finalN1, pick.n2],
       problemText: finalProblem,
       expectedResult: finalRes,
       hint: pick.h,
@@ -135,10 +171,12 @@ export function generateQuestionById(id: number): BankQuestion {
       { n1: 8, n2: 6, res: 14, h: '+6 = +10 - 5 + 1' },
     ];
     const pick = mixedPatterns[id % mixedPatterns.length];
-    const base = Math.floor(rng() * 30) * 10;
+    const base = Math.floor(rng() * 35) * 10;
     const finalN1 = pick.n1 + base;
     const finalRes = pick.res + base;
-    const finalProblem = `${finalN1} ${pick.n2 > 0 ? `+ ${pick.n2}` : `- ${Math.abs(pick.n2)}`}`;
+    const op: '+' | '-' = pick.n2 > 0 ? '+' : '-';
+    const absN2 = Math.abs(pick.n2);
+    const finalProblem = `${finalN1} ${op} ${absN2}`;
 
     return {
       id,
@@ -146,6 +184,10 @@ export function generateQuestionById(id: number): BankQuestion {
       stageName: 'Mixed Combinations Subtraction (破五加減算)',
       stageJapanese: '第4部: 破五加減算 (混合公式の極意)',
       category: 'mitorizan',
+      num1: finalN1,
+      operation: op,
+      num2: absN2,
+      numbers: [finalN1, pick.n2],
       problemText: finalProblem,
       expectedResult: finalRes,
       hint: pick.h,
@@ -221,55 +263,161 @@ export function generateQuestionById(id: number): BankQuestion {
   }
 
   // STAGE 7: Q901 - Q1000: Grandmaster Championship Challenges (段位総合特訓)
-  const isMult = id % 3 === 0;
-  const isDiv = id % 3 === 1;
+  if (id <= 1000) {
+    const isMult = id % 3 === 0;
+    const isDiv = id % 3 === 1;
 
-  if (isMult) {
-    const n1 = Math.floor(rng() * 400) + 150;
-    const n2 = Math.floor(rng() * 60) + 20;
+    if (isMult) {
+      const n1 = Math.floor(rng() * 400) + 150;
+      const n2 = Math.floor(rng() * 60) + 20;
+      return {
+        id,
+        stage: 7,
+        stageName: 'Grandmaster Marathon (段位総合特訓)',
+        stageJapanese: '第7部: 名人総合特訓 (最難関)',
+        category: 'kakezan',
+        num1: n1,
+        operation: '×',
+        num2: n2,
+        problemText: `${n1} × ${n2}`,
+        expectedResult: n1 * n2,
+        hint: 'Championship 3-digit × 2-digit multiplication.',
+      };
+    }
+
+    if (isDiv) {
+      const divisor = Math.floor(rng() * 45) + 15;
+      const quotient = Math.floor(rng() * 80) + 25;
+      const dividend = divisor * quotient;
+      return {
+        id,
+        stage: 7,
+        stageName: 'Grandmaster Marathon (段位総合特訓)',
+        stageJapanese: '第7部: 名人総合特訓 (最難関)',
+        category: 'warizan',
+        num1: dividend,
+        operation: '÷',
+        num2: divisor,
+        problemText: `${dividend} ÷ ${divisor}`,
+        expectedResult: quotient,
+        hint: 'Championship 4-digit ÷ 2-digit division.',
+      };
+    }
+
+    // Mitori-zan 5-row multi-digit marathon
+    const rowCount = 5;
+    const numbers: number[] = [];
+    let running = Math.floor(rng() * 300) + 200;
+    numbers.push(running);
+
+    for (let r = 1; r < rowCount; r++) {
+      let n = Math.floor(rng() * 200) + 50;
+      if (running > n * 1.5 && rng() > 0.5) {
+        n = -n;
+      }
+      running += n;
+      numbers.push(n);
+    }
+
+    const text = numbers.map((n, i) => (i === 0 ? `${n}` : n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`)).join(' ');
     return {
       id,
       stage: 7,
       stageName: 'Grandmaster Marathon (段位総合特訓)',
       stageJapanese: '第7部: 名人総合特訓 (最難関)',
+      category: 'mitorizan',
+      problemText: text,
+      numbers,
+      expectedResult: running,
+      hint: 'Multi-digit columnar addition and subtraction marathon.',
+    };
+  }
+
+  // =========================================================================
+  // STAGE 8: Q1001 - Q1100+: 鬼神の試練 (Kishin Demonic Trial - Devil Level)
+  // Extreme Grandmaster multi-million calculations
+  // =========================================================================
+  const kishinType = id % 4;
+
+  if (kishinType === 0) {
+    // Type 1: Kishin 7-8 Row Multi-Million Mitori-zan (鬼神・大見取算)
+    const rowCount = 7 + (id % 2);
+    const numbers: number[] = [];
+    let running = Math.floor(rng() * 400000) + 350000;
+    numbers.push(running);
+
+    for (let r = 1; r < rowCount; r++) {
+      let n = Math.floor(rng() * 250000) + 120000;
+      if (running > n * 1.5 && rng() > 0.45) {
+        n = -n;
+      }
+      running += n;
+      numbers.push(n);
+    }
+
+    const text = numbers.map((n, i) => (i === 0 ? `${n}` : n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`)).join(' ');
+    return {
+      id,
+      stage: 8,
+      stageName: 'Kishin Demonic Trial (鬼神の試練 • Devil Level)',
+      stageJapanese: '第8部: 鬼神の試練 (大見取算 • 7桁暗算領域)',
+      category: 'mitorizan',
+      problemText: text,
+      numbers,
+      expectedResult: running,
+      hint: '🔥 KISHIN DEMONIC MITORI-ZAN: 7–8 rows of 6-digit values exceeding 1,000,000. Maintain rock-solid alignment across rods 6 through 9.',
+    };
+  }
+
+  if (kishinType === 1) {
+    // Type 2: Kishin Titanium Kake-zan (鬼神・超絶多桁乗算: 4-digit × 4-digit)
+    const n1 = Math.floor(rng() * 6000) + 2100;
+    const n2 = Math.floor(rng() * 6000) + 1800;
+    const expected = n1 * n2;
+    return {
+      id,
+      stage: 8,
+      stageName: 'Kishin Demonic Trial (鬼神の試練 • Devil Level)',
+      stageJapanese: '第8部: 鬼神の試練 (超絶4桁×4桁乗算)',
       category: 'kakezan',
       num1: n1,
       operation: '×',
       num2: n2,
       problemText: `${n1} × ${n2}`,
-      expectedResult: n1 * n2,
-      hint: 'Championship 3-digit × 2-digit multiplication.',
+      expectedResult: expected,
+      hint: `🔥 KISHIN TITANIUM MULTIPLICATION: ${n1} × ${n2}. Accumulate 16 partial products across 8 columns. Product reaches tens of millions!`,
     };
   }
 
-  if (isDiv) {
-    const divisor = Math.floor(rng() * 45) + 15;
-    const quotient = Math.floor(rng() * 80) + 25;
+  if (kishinType === 2) {
+    // Type 3: Kishin Abyssal Wari-zan (鬼神・閻魔除算: 8-digit ÷ 4-digit)
+    const divisor = Math.floor(rng() * 5000) + 2100;
+    const quotient = Math.floor(rng() * 6000) + 2500;
     const dividend = divisor * quotient;
     return {
       id,
-      stage: 7,
-      stageName: 'Grandmaster Marathon (段位総合特訓)',
-      stageJapanese: '第7部: 名人総合特訓 (最難関)',
+      stage: 8,
+      stageName: 'Kishin Demonic Trial (鬼神の試練 • Devil Level)',
+      stageJapanese: '第8部: 鬼神の試練 (閻魔8桁÷4桁除算)',
       category: 'warizan',
       num1: dividend,
       operation: '÷',
       num2: divisor,
       problemText: `${dividend} ÷ ${divisor}`,
       expectedResult: quotient,
-      hint: 'Championship 4-digit ÷ 2-digit division.',
+      hint: `🔥 KISHIN ABYSSAL DIVISION: ${dividend} ÷ ${divisor}. 8-digit dividend into 4-digit divisor. Estimate quotients with razor precision to avoid negative adjustments.`,
     };
   }
 
-  // Mitori-zan 5-row multi-digit marathon
-  const rowCount = 5;
+  // Type 4: Kishin Rapid Multi-Column Marathon (鬼神・十行連珠算)
+  const rowCount = 9;
   const numbers: number[] = [];
-  let running = Math.floor(rng() * 300) + 200;
+  let running = Math.floor(rng() * 60000) + 40000;
   numbers.push(running);
 
   for (let r = 1; r < rowCount; r++) {
-    let n = Math.floor(rng() * 200) + 50;
-    if (running > n * 1.5 && rng() > 0.5) {
+    let n = Math.floor(rng() * 35000) + 15000;
+    if (running > n * 1.5 && rng() > 0.45) {
       n = -n;
     }
     running += n;
@@ -279,13 +427,13 @@ export function generateQuestionById(id: number): BankQuestion {
   const text = numbers.map((n, i) => (i === 0 ? `${n}` : n >= 0 ? `+ ${n}` : `- ${Math.abs(n)}`)).join(' ');
   return {
     id,
-    stage: 7,
-    stageName: 'Grandmaster Marathon (段位総合特訓)',
-    stageJapanese: '第7部: 名人総合特訓 (最難関)',
+    stage: 8,
+    stageName: 'Kishin Demonic Trial (鬼神の試練 • Devil Level)',
+    stageJapanese: '第8部: 鬼神の試練 (十行連珠算 • 極限速算)',
     category: 'mitorizan',
     problemText: text,
     numbers,
     expectedResult: running,
-    hint: 'Multi-digit columnar addition and subtraction marathon.',
+    hint: '🔥 KISHIN 9-ROW SPEED DRILL: Consecutive 5-digit carries and borrows across columns. Keep total composure.',
   };
 }
