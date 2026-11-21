@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <rect width="128" height="128" rx="28" fill="#161312"/>
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#f59e42" stroke-width="2"/>
+  <!-- Enso Arc -->
+  <path d="M 64,22 A 42,42 0 1,1 28,48" fill="none" stroke="#e05638" stroke-width="6" stroke-linecap="round"/>
+  <!-- Rod -->
+  <rect x="62.5" y="24" width="3" height="80" rx="1.5" fill="#a89c97"/>
+  <!-- Beam -->
+  <rect x="42" y="52" width="44" height="6" rx="1.5" fill="#2c2826" stroke="#574d49" stroke-width="0.8"/>
+  <circle cx="64" cy="55" r="1.5" fill="#ffffff"/>
+  <!-- Upper Bead (5) -->
+  <polygon points="56,44 72,44 79,48 49,48" fill="#f06c4b"/>
+  <polygon points="49,48 79,48 72,52 56,52" fill="#c44527"/>
+  <!-- Lower Bead (1) -->
+  <polygon points="56,58 72,58 79,62 49,62" fill="#f06c4b"/>
+  <polygon points="49,62 79,62 72,66 56,66" fill="#c44527"/>
+  <!-- Lower Bead (1) -->
+  <polygon points="56,68 72,68 79,72 49,72" fill="#f06c4b"/>
+  <polygon points="49,72 79,72 72,76 56,76" fill="#c44527"/>
+  <!-- Text -->
+  <text x="64" y="104" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="16" fill="#fdf8f0">
+    そろばん
+  </text>
+</svg>
